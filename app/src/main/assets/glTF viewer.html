@@ -1,0 +1,229 @@
+<html lan="en">
+<body>
+<br />
+<br />
+<br />
+<br />
+<label for="path">file to be loaded:</label>
+
+<input type="text" id="path" name="name" size="10">
+<!--button 1-->
+<button type="button" onclick="loadGltf()">click to load the file</button>
+<!--button 2-->
+<button type="button" onclick="cleanScene()">click to clean scene</button>
+<label for="LIGHTS">Choose a light:</label>
+<select name="lights" id="lights">
+    <option value="SpotLight">SpotLight</option>
+    <option value="DirectionalLight">DirectionalLight</option>
+    <option value="PointLight">PointLight</option>
+</select>
+<!--button 3-->
+<button type="button" onclick="addLight()">press to add the chosen light</button>
+<!--button 4-->
+<button type="button" onclick="deleteLights()">click to delete all lights from the scene</button>
+
+<!--button 5-->
+<button type="button" onclick="removeScenes()">click to delete all scenes</button>
+<script async src="https://gltfviewer.000webhostapp.com/node_modules/es-module-shims/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+          {
+            "imports": {
+              "three": "https://gltfviewer.000webhostapp.com/node_modules/three/build/three.module.js"
+
+            }
+          }
+        </script>
+<script type="module">
+            import * as THREE from 'three';
+            import { OrbitControls } from 'https://gltfviewer.000webhostapp.com/node_modules/three/examples/jsm/controls/OrbitControls.js';
+            import { GLTFLoader } from 'https://gltfviewer.000webhostapp.com/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+            import { DRACOLoader } from 'https://gltfviewer.000webhostapp.com/node_modules/three/examples/jsm/loaders/DRACOLoader.js';
+            import * as dat from 'https://gltfviewer.000webhostapp.com/node_modules/dat.gui/build/dat.gui.module.js';
+            import Stats from 'https://gltfviewer.000webhostapp.com/node_modules/three/examples/jsm/libs/stats.module.js';
+            //With this function we update the canvas
+            function animate() {
+
+                requestAnimationFrame( animate );
+                stats.update();
+                controls.update();//update() is called after changing the camera's position
+                renderer.render( scene, camera );//render the scene with the camera
+
+            };
+            // This function is called after button 1 is clicked.
+            // This function is used to load the glTF scene in the main scene of the html page
+            function loadGltf(){
+                var loader = new GLTFLoader();
+                var dracoLoader = new DRACOLoader();
+                dracoLoader.setDecoderPath( 'https://gltfviewer.000webhostapp.com/node_modules/three/examples/js/libs/draco/' );
+                loader.setDRACOLoader( dracoLoader );
+                loader.load(document.getElementById('path').value,
+                function ( gltf ) {
+
+
+                    gltf.scene.position.x = 0;
+                    gltf.scene.position.y = 0;
+                    gltf.scene.position.z = 0;
+                    modelFolder.add(gltf.scene.position, 'x').name("x"+sceneCounter);
+                    modelFolder.add(gltf.scene.position, 'y').name("y"+sceneCounter);
+                    modelFolder.add(gltf.scene.position, 'z').name("z"+sceneCounter);
+                    scene.add( gltf.scene );
+                    sceneCounter++;
+
+                });
+            }
+
+            // This function is called after button 2 is clicked.
+            //With this function we add the light that was chosen to the scene and to the gui
+            function addLight(){
+                let myLight=document.getElementById('lights').value;
+                lightCounter++;
+                switch(myLight){
+                    case "SpotLight":
+                        var light= new THREE.SpotLight(0xffffff,1);
+                        light.position.set(2,5,5);
+                        scene.add(light);
+                        scene.add( light.target );
+                        folder.add(light.position, 'x').name("x"+lightCounter);
+                        folder.add(light.position, 'y').name("y"+lightCounter);
+                        folder.add(light.position, 'z').name("z"+lightCounter);
+                        folder.add(light.target.position, 'x').name("shine at: x"+lightCounter);
+                        folder.add(light.target.position, 'y').name("shine at: y"+lightCounter);
+                        folder.add(light.target.position, 'z').name("shine at: z"+lightCounter);
+                        folder.add(light, 'intensity', 0 ,1);
+                        folder.open();
+                        break;
+                    case "PointLight":
+                        var light= new THREE.PointLight(0xffffff,1);
+                        light.position.set(2,5,5);
+                        scene.add(light);
+                        folder.add(light.position, 'x').name("x"+lightCounter);
+                        folder.add(light.position, 'y').name("y"+lightCounter);
+                        folder.add(light.position, 'z').name("z"+lightCounter);
+                        folder.add(light, 'intensity', 0 ,1);
+                        folder.open();
+                        break;
+                    case "DirectionalLight":
+                        var light= new THREE.DirectionalLight(0xffffff,1);
+                        light.position.set(2,2,5);
+                        scene.add(light);
+                        scene.add( light.target );
+                        folder.add(light.position, 'x').name("x"+lightCounter);
+                        folder.add(light.position, 'y').name("y"+lightCounter);
+                        folder.add(light.position, 'z').name("z"+lightCounter);
+                        folder.add(light.target.position, 'x').name("shine at: x"+lightCounter);
+                        folder.add(light.target.position, 'y').name("shine at: y"+lightCounter);
+                        folder.add(light.target.position, 'z').name("shine at: z"+lightCounter);
+                        folder.add(light, 'intensity', 0 ,1);
+                        folder.open();
+                        break;
+                    default:
+                        var light= new THREE.SpotLight(0xffffff,1);
+                        light.position.set(2,2,5);
+                        scene.add(light);
+                        scene.add( light.target );
+                        folder.add(light.position, 'x').name("x"+lightCounter);
+                        folder.add(light.position, 'y').name("y"+lightCounter);
+                        folder.add(light.position, 'z').name("z"+lightCounter);
+                        folder.add(light.target.position, 'x').name("shine at: x"+lightCounter);
+                        folder.add(light.target.position, 'y').name("shine at: y"+lightCounter);
+                        folder.add(light.target.position, 'z').name("shine at: z"+lightCounter);
+                        folder.add(light, 'intensity', 0 ,1);
+                        folder.open();
+                }
+            }
+            // This function is called after button 3 is clicked.
+            //With this function we clear the canvas(the camera isn't deleted)
+            function cleanScene(){
+                while(scene.children.length > 0){
+
+                    scene.remove(scene.children[0]);
+                }
+                gui.removeFolder(folder);
+                folder=gui.addFolder("lights");
+                sceneCounter=1;
+                lightCounter=0;
+
+            }
+            // This function is called after button 4 is clicked.
+            //With this function we delete all the lights
+            function deleteLights(){
+                console.log(scene.children[0]);
+                let length=scene.children.length;
+                let i =0;
+                while(true)
+                {
+                    if(i===scene.children.length){
+                            break;
+                        }
+                    if(scene.children[i].type === 'SpotLight' ||scene.children[i].type === 'PointLight' ||scene.children[i].type === 'DirectionalLight'){
+                        scene.children[i].removeFromParent();
+                    }
+                    else{
+
+                        i++;
+
+                    }
+
+                }
+                gui.removeFolder(folder)
+                folder=gui.addFolder("lights");
+                lightCounter=0;
+                console.log(scene.children);
+
+            }
+
+            function removeScenes(){
+                for (let i=scene.children.length-1;i>=0;i--) {
+                    if(scene.children[i].type==='Group')
+                        scene.remove(scene.children[i]);
+                }
+                gui.removeFolder(modelFolder);
+                modelFolder=gui.addFolder("scenes");
+                sceneCounter=1;
+            }
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );//(fov,width/height,near,far)
+            scene.background = new THREE.Color( 0xf0f0ff );
+            const renderer = new THREE.WebGLRenderer();
+            const controls = new OrbitControls( camera, renderer.domElement );//Used to control camera with touch screen
+            renderer.setSize( window.innerWidth, window.innerHeight );//Resize canvas to fit the screen
+            document.body.appendChild( renderer.domElement );//Append the canvas to the html
+            camera.position.z = 50;//Change camera position so that we can see (0,0,0)(the where the model/models are going to be)
+            let sceneCounter=1;
+            let lightCounter=0;
+            //Initialize the  gui
+            const gui = new dat.GUI(
+            {
+
+                top: 0,
+                left: 0,
+                right:0,
+                bottom: 100,
+                width :100
+            })
+            //Add camera position to gui (it's easier to use this than using the touchscreen)
+            var cameraFolder=gui.__folders["camera"];
+            cameraFolder=gui.addFolder("camera");
+            cameraFolder.add(camera.position,"x");
+            cameraFolder.add(camera.position,"y");
+            cameraFolder.add(camera.position,"z");
+
+
+            var folder=gui.__folders["lights"];
+            folder=gui.addFolder("lights");
+            var modelFolder=gui.__folders["scenes"];
+            modelFolder=gui.addFolder("scenes");
+            //https://raw.githubusercontent.com/stathispetridis/thesis/main/glTF/dodoni_eagle_final.gltf  (easy access to the url to load the glTF)
+
+            window.loadGltf=loadGltf;//Link button 1 function with script function
+            window.addLight=addLight;//Link button 2 function with script function
+            window.cleanScene=cleanScene;//Link button 3 function with script function
+            window.deleteLights=deleteLights;//Link button 4 function with script function
+            window.removeScenes=removeScenes;//Link button 5 function with the script function
+            const stats = new Stats();
+            document.body.appendChild( stats.dom );
+            animate();//Start updating the canvas
+        </script>
+</body>
+</html>
